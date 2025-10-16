@@ -13,6 +13,7 @@ public class Main {
 
         // Adding the game panel to the main window
         GamePanel gamePanel = new GamePanel();
+        gamePanel.startGameThread();
         window.add(gamePanel);
 
         window.pack();
