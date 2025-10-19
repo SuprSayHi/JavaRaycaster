@@ -1,8 +1,10 @@
-package main;
+package com.main;
 
-import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.*;
+
 import javax.swing.*;
+
+import com.entity.Player;
 
 public class GamePanel extends JPanel implements Runnable {
     // Settings of the screen
@@ -20,12 +22,17 @@ public class GamePanel extends JPanel implements Runnable {
 
     KeyHandler keyHandler = new KeyHandler(); // Place where all inputs managed
 
+    // Graphics g = this.getGraphics(); // Graphics
 
-    // Game
+
+    // Main game loop
     @Override
     public void run() {
-        while (true) { 
-            // System.out.println(keyHandler.keysPressed);   
+        Player player = new Player(this);
+
+        while (true) {
+            // Drawing
+            g2d.fillRect(player.pos.x, player.pos.y, 20, 20);
         }
 
     }
