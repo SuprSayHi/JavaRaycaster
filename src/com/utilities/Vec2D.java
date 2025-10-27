@@ -3,7 +3,6 @@ package com.utilities;
 public class Vec2D {
     public double x, y;
 
-
     // Constructors
     public Vec2D() {
         this.x = 0;
@@ -20,5 +19,4 @@ public class Vec2D {
         this.y = y;
     }
 
-    
 }

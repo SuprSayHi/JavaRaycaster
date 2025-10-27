@@ -5,6 +5,7 @@ import java.awt.*;
 import javax.swing.*;
 
 import com.entity.Player;
+import com.input.KeyHandler;
 
 public class GamePanel extends JPanel implements Runnable {
     // Settings of the screen
@@ -20,24 +21,22 @@ public class GamePanel extends JPanel implements Runnable {
 
     Thread gameThread; // Thread that is going to be used
 
-    KeyHandler keyHandler = new KeyHandler(); // Place where all inputs managed
-
-    // Graphics g = this.getGraphics(); // Graphics
+    KeyHandler keyH = new KeyHandler(); // Place where all inputs managed
 
 
-    // Main game loop
-    @Override
-    public void run() {
-        Player player = new Player(this);
+    // FPS
+    int FPS = 60;
 
-        while (true) {
-            // Drawing
-            g2d.fillRect(player.pos.x, player.pos.y, 20, 20);
-        }
 
-    }
+    // Player attributes
+    int playerX = 100;
+    int playerY = 100;
+    int playerSpeed = 4;
+    
 
+    // Methods
     public void startGameThread() {
+
         gameThread = new Thread(this);
         gameThread.start();
 
@@ -48,8 +47,95 @@ public class GamePanel extends JPanel implements Runnable {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
-        this.addKeyListener(keyHandler);
+        this.addKeyListener(keyH);
         this.setFocusable(true);
 
+    }
+
+    // Main game loop
+    @Override
+    public void run() {
+
+        double drawInterval = 1_000_000_000 / FPS;
+        double deltaT = 0; // Time elapsed
+
+        // Last and current time
+        long lastTime = System.nanoTime();
+        long currentTime;
+
+        // Timer and getting fps
+        long timer = 0;
+        int drawCount = 0;
+
+
+        // Main loop
+        while (gameThread != null) {
+
+            currentTime = System.nanoTime();
+
+            deltaT += (currentTime - lastTime) / drawInterval;
+            timer += (currentTime - lastTime);
+
+            lastTime = currentTime;
+
+            if (deltaT >= 1) {
+
+                // Update
+                update();
+
+                // Repaint everything
+                repaint();
+
+                // Update delta and draw count
+                deltaT--;
+                drawCount++;
+
+            }
+
+            // If a second has passed in nanoseconds
+            if (timer >= 1_000_000_000) {
+                System.out.println("Fps: " + drawCount);
+
+                timer = 0;
+                drawCount= 0;
+            }
+        }
+
+    }
+
+    public void update() {
+
+        // Handle up movement
+        if (keyH.upPressed == true) {
+            playerY -= playerSpeed;
+        }
+
+        // Handle down movement
+        if (keyH.downPressed == true) {
+            playerY += playerSpeed;
+        }
+
+        // Handle left movement
+        if (keyH.leftPressed == true) {
+            playerX -= playerSpeed;
+        }
+
+        // Handle right movement
+        if (keyH.rightPressed == true) {
+            playerX += playerSpeed;
+        }
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        Graphics2D g2d = (Graphics2D) g;
+
+        g2d.setColor(Color.WHITE);
+
+        g2d.fillRect(playerX, playerY, tileSize, tileSize);
+
+        g2d.dispose();
     }
 }
