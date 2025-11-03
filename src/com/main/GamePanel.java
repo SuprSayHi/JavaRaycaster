@@ -6,32 +6,30 @@ import javax.swing.*;
 
 import com.entity.Player;
 import com.input.KeyHandler;
+import com.tiles.TileMap;
 
 public class GamePanel extends JPanel implements Runnable {
     // Settings of the screen
     final int originalTileSize = 16; // 16x16 pixel tile size
     final int scale = 3;
 
-    final int tileSize = originalTileSize * scale; // the actual tile size being 48x48
-    final int maxScreenCol = 16; // number of columns on the screen
-    final int maxScreenRow = 12; // number of rows on the screen
+    public final int tileSize = originalTileSize * scale; // the actual tile size being 48x48
+    public final int maxScreenCol = 16; // number of columns on the screen
+    public final int maxScreenRow = 12; // number of rows on the screen
 
     final int screenWidth = tileSize * maxScreenCol; // 768 px width
     final int screenHeight = tileSize * maxScreenRow; // 576 px height
 
-    Thread gameThread; // Thread that is going to be used
 
+    Thread gameThread; // Thread that is going to be used
+    
+    TileMap tileM = new TileMap(this);
     KeyHandler keyH = new KeyHandler(); // Place where all inputs managed
+    Player player = new Player(this, keyH); // The player object
 
 
     // FPS
     int FPS = 60;
-
-
-    // Player attributes
-    int playerX = 100;
-    int playerY = 100;
-    int playerSpeed = 4;
     
 
     // Methods
@@ -63,19 +61,13 @@ public class GamePanel extends JPanel implements Runnable {
         long lastTime = System.nanoTime();
         long currentTime;
 
-        // Timer and getting fps
-        long timer = 0;
-        int drawCount = 0;
-
 
         // Main loop
         while (gameThread != null) {
 
+            // Ensuring fps is around 60
             currentTime = System.nanoTime();
-
             deltaT += (currentTime - lastTime) / drawInterval;
-            timer += (currentTime - lastTime);
-
             lastTime = currentTime;
 
             if (deltaT >= 1) {
@@ -88,16 +80,7 @@ public class GamePanel extends JPanel implements Runnable {
 
                 // Update delta and draw count
                 deltaT--;
-                drawCount++;
 
-            }
-
-            // If a second has passed in nanoseconds
-            if (timer >= 1_000_000_000) {
-                System.out.println("Fps: " + drawCount);
-
-                timer = 0;
-                drawCount= 0;
             }
         }
 
@@ -105,25 +88,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void update() {
 
-        // Handle up movement
-        if (keyH.upPressed == true) {
-            playerY -= playerSpeed;
-        }
-
-        // Handle down movement
-        if (keyH.downPressed == true) {
-            playerY += playerSpeed;
-        }
-
-        // Handle left movement
-        if (keyH.leftPressed == true) {
-            playerX -= playerSpeed;
-        }
-
-        // Handle right movement
-        if (keyH.rightPressed == true) {
-            playerX += playerSpeed;
-        }
+        player.update();
     }
 
     @Override
@@ -132,9 +97,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         Graphics2D g2d = (Graphics2D) g;
 
-        g2d.setColor(Color.WHITE);
-
-        g2d.fillRect(playerX, playerY, tileSize, tileSize);
+        tileM.draw(g2d);
+        player.draw(g2d);
 
         g2d.dispose();
     }
