@@ -2,7 +2,10 @@ package com.tiles;
 
 import com.main.GamePanel;
 import java.awt.Graphics2D;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageInputStream;
 
@@ -18,13 +21,17 @@ public class TileMap {
         loadTileResources();
 
         tilemap = new int[this.gpl.maxScreenRow][this.gpl.maxScreenCol];
+        loadTileMap();
     }
 
     // Loads all the tile images at the start of the program
     private void loadTileResources() {
         try {
             tiles[0] = new Tile();
-            tiles[0].image = ImageIO.read((ImageInputStream) getClass().getResourceAsStream("res/tiles/grass.png"));
+            tiles[0].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grass.png"));
+
+            tiles[1] = new Tile();
+            tiles[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/wall.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,19 +42,43 @@ public class TileMap {
 
     // Load the tile map from a file into the tiles array
     public void loadTileMap() {
-        tilemap[0][0] = 0; // technically does nothing but
+        try {
+            InputStream in = getClass().getResourceAsStream("/maps/map_00.txt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+            // Read the data line by line
+            int row = 0;
+            while (br.ready()) {
+                String line = br.readLine();
+                String[] numbersStr = line.split(" ");
+
+                for (int col = 0; col < numbersStr.length; col++) {
+                    tilemap[row][col] = Integer.parseInt(numbersStr[col]);
+                }
+
+                row++; // Increment the row
+            }
+
+            br.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+
     }
 
 
     // Draw the tile map
     public void draw(Graphics2D g2d) {
-        for (int row = 0; row < gpl.maxScreenRow; row++)
+        for (int row = 0; row < tilemap.length; row++)
         {
-            for (int col = 0; col < gpl.maxScreenCol; col++)
+            for (int col = 0; col < tilemap[row].length; col++)
             {
                 int mapValue = tilemap[row][col];
                 g2d.drawImage(
-                    tiles[mapValue].image, row * gpl.tileSize, col * gpl.tileSize, gpl.tileSize, gpl.tileSize, null
+                    tiles[mapValue].image, col * gpl.tileSize, row * gpl.tileSize, gpl.tileSize, gpl.tileSize, null
                 );
             }
         }

@@ -14,17 +14,27 @@ public class Player extends Entity {
     private KeyHandler keyH;
 
     public Player(GamePanel gpl, KeyHandler keyH) {
-        this.pos = new Point(0, 0);
-        this.vel = new Vec2D(0, 0);
+        this.pos = new Point(230, 230);
 
-        this.speed = 5;
+        this.speed = 2;
         this.gpl = gpl;
         this.keyH = keyH;
     }
 
 
     public void update() {
-        
+        if (keyH.downPressed) {
+            this.pos.y += speed;
+        }
+        if (keyH.upPressed) {
+            this.pos.y -= speed;
+        }
+        if (keyH.leftPressed) {
+            this.pos.x -= speed;
+        }
+        if (keyH.rightPressed) {
+            this.pos.x += speed;
+        }
     }
 
 
